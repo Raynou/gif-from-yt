@@ -1,11 +1,12 @@
 import { useState } from "react";
 
-const VideoForm = ({ callback = () => {} }) => {
+const VideoForm = ({ onSubmit = () => {}, onSubmitSucess = () => {}}) => {
   const [url, setUrl] = useState("");
   const handleInput = (e) => {
     setUrl(e.target.value);
   };
   const getVideo = async () => {
+    onSubmit();
     const data = {
       url: url,
     };
@@ -16,7 +17,7 @@ const VideoForm = ({ callback = () => {} }) => {
       },
       body: JSON.stringify(data),
     });
-    callback();
+    onSubmitSucess(url);
   };
 
   return (
