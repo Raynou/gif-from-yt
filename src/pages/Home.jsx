@@ -1,14 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import VideoForm from "../components/VideoForm";
+import { useState } from "react";
+import FullScreenModal from "../components/FullScreenModal";
 
 const Home = () => {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   return (
-    <VideoForm
-      callback={() => {
-        navigate("/gif");
-      }}
-    />
+    <>
+      {isLoading && <FullScreenModal />}
+      <VideoForm
+        onSubmit={() => setIsLoading(true)}
+        onSubmitSucess={(url) => {
+          const id = url.split("?v=")[1];
+          navigate("/gif?v=" + id);
+        }}
+      />
+    </>
   );
 };
 

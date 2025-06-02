@@ -2,7 +2,6 @@ import { useState, useRef } from "react";
 import GifDurationSlider from "./GifDurationSlider";
 import VideoSlider from "./VideoSlider";
 import VideoPlaybackControls from "./VideoPlaybackControls";
-import VideoForm from "./VideoForm";
 
 const GifForm = () => {
   const [progress, setProgress] = useState(0);
@@ -12,15 +11,10 @@ const GifForm = () => {
   const videoRef = useRef(null);
 
   const handleTimeUpdate = () => setProgress(videoRef.current.currentTime || 0);
+
   const handleLoadedMetadata = () =>
     setDuration(videoRef.current.duration || 0);
-  const formatTime = (time) => {
-    if (time > 60) return `${parseInt(time / 60)}:${(time % 60).toFixed(1)}`;
-    return `0:${time < 10 ? "0" : ""}${time
-      .toFixed(1)
-      .toString()
-      .replace(".", ":")}`;
-  };
+
   const getGif = (init, duration = "00:00:01") => {
     fetch("http://localhost:3000/gif", {
       method: "POST",
@@ -40,14 +34,22 @@ const GifForm = () => {
       });
   };
 
+  const formatTimeAndDuration = () => {
+    const minutes = Number.parseInt(progress / 60);
+    const seconds = Number.parseInt(progress % 60);
+    const ms = progress.toFixed(2).split(".")[1];
+    const time = `00:${minutes < 10 ? "0" : ""}${minutes}:${
+      seconds < 10 ? "0" : ""
+    }${seconds}.${ms}`;
+    const [gifSeconds, gifMs] = gifDuration.toString().split(".");
+    const duration = `00:00:${gifSeconds > 10 ? "" : "0"}${gifSeconds}${
+      gifMs ? "." : ""
+    }${gifMs || ""}`;
+    return [time, duration];
+  };
+
   return (
     <>
-      <VideoForm
-        callback={() => {
-          location.reload();
-        }}
-      />
-      <div>{formatTime(progress)}</div>
       <VideoPlaybackControls
         progress={progress}
         setProgress={setProgress}
@@ -58,6 +60,7 @@ const GifForm = () => {
       <GifDurationSlider
         gifDuration={gifDuration}
         setGifDuration={setGifDuration}
+        progress={progress}
       />
       <VideoSlider
         videoDuration={duration}
@@ -76,16 +79,7 @@ const GifForm = () => {
       />
       <button
         onClick={() => {
-          const minutes = Number.parseInt(progress / 60);
-          const seconds = Number.parseInt(progress % 60);
-          const ms = progress.toFixed(2).split(".")[1];
-          const time = `00:${minutes < 10 ? "0" : ""}${minutes}:${
-            seconds < 10 ? "0" : ""
-          }${seconds}.${ms}`;
-          const [gifSeconds, gifMs] = gifDuration.toString().split(".");
-          const duration = `00:00:${gifSeconds > 10 ? "" : "0"}${gifSeconds}${
-            gifMs ? "." : ""
-          }${gifMs || ""}`;
+          const [time, duration] = formatTimeAndDuration();
           getGif(time, duration);
         }}
       >

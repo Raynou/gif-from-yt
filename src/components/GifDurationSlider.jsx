@@ -1,5 +1,5 @@
-const GifDurationSlider = ({ gifDuration, setGifDuration }) => {
-  const handleXD = (e) => {
+const GifDurationSlider = ({ gifDuration, setGifDuration, progress }) => {
+  const handleChange = (e) => {
     const newDuration = parseFloat(e.target.value);
     setGifDuration(newDuration);
   };
@@ -15,15 +15,23 @@ const GifDurationSlider = ({ gifDuration, setGifDuration }) => {
     }
     setGifDuration(parseFloat(e.target.value));
   };
+  const formatTime = (time) => {
+    if (time > 60) return `${parseInt(time / 60)}:${(time % 60).toFixed(1)}`;
+    return `0:${time < 10 ? "0" : ""}${time
+      .toFixed(1)
+      .toString()
+      .replace(".", ":")}`;
+  };
   return (
     <>
+      <div>{formatTime(progress)}</div>
       <input
         type="range"
         min="0.1"
         max="10.0"
         step="0.1"
         value={gifDuration}
-        onChange={handleXD}
+        onChange={handleChange}
       />
       <input type="number" value={gifDuration} onInput={handleInput} />
     </>
