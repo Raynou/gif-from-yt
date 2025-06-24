@@ -7,7 +7,7 @@ const Home = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   return (
-    <>
+    <div className="flex items-center justify-center py-8 px-4 flex-1">
       {isLoading && <FullScreenModal />}
       <VideoForm
         onSubmit={() => setIsLoading(true)}
@@ -16,7 +16,7 @@ const Home = () => {
           navigate("/gif?v=" + id);
         }}
       />
-    </>
+    </div>
   );
 };
 

@@ -1,8 +1,9 @@
-const GifDurationSlider = ({ gifDuration, setGifDuration, progress }) => {
+const GifDurationSlider = ({ gifDuration, setGifDuration }) => {
   const handleChange = (e) => {
     const newDuration = parseFloat(e.target.value);
     setGifDuration(newDuration);
   };
+
   const handleInput = (e) => {
     const input = parseFloat(e.target.value);
     if (input >= 10) {
@@ -15,16 +16,22 @@ const GifDurationSlider = ({ gifDuration, setGifDuration, progress }) => {
     }
     setGifDuration(parseFloat(e.target.value));
   };
-  const formatTime = (time) => {
-    if (time > 60) return `${parseInt(time / 60)}:${(time % 60).toFixed(1)}`;
-    return `0:${time < 10 ? "0" : ""}${time
-      .toFixed(1)
-      .toString()
-      .replace(".", ":")}`;
-  };
+
   return (
-    <>
-      <div>{formatTime(progress)}</div>
+    <div className="flex flex-col gap-2 w-full px-4 py-2 text-typo rounded-lg">
+      <div className="flex items-center gap-3">
+        <label className="text-sm font-mono">Duration:</label>
+        <input
+          type="number"
+          value={gifDuration}
+          onInput={handleInput}
+          step="0.1"
+          min="0.1"
+          max="10.0"
+          className="w-24 text-sm px-2 py-1 rounded focus:outline-none border border-typo"
+        />
+        <span className="text-xs">sec</span>
+      </div>
       <input
         type="range"
         min="0.1"
@@ -32,9 +39,9 @@ const GifDurationSlider = ({ gifDuration, setGifDuration, progress }) => {
         step="0.1"
         value={gifDuration}
         onChange={handleChange}
+        className="w-full h-2 accent-primary rounded-lg cursor-pointer"
       />
-      <input type="number" value={gifDuration} onInput={handleInput} />
-    </>
+    </div>
   );
 };
 

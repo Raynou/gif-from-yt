@@ -1,3 +1,5 @@
+import Button from "./Button";
+
 const VideoPlaybackControls = ({
   progress,
   setProgress,
@@ -5,6 +7,9 @@ const VideoPlaybackControls = ({
   pause,
   setPause,
 }) => {
+  const SECOND_VALUE = 1;
+  const MS_VALUE = 0.1;
+
   const handlePause = () => {
     if (!videoRef.current) return;
     if (!pause) {
@@ -16,58 +21,52 @@ const VideoPlaybackControls = ({
     }
   };
 
-  const handleSkipForwardSecond = () => {
-    const newTime = progress + 1;
+  const handleSkipForward = (value) => {
     if (!videoRef.current) return;
-    if (!pause) {
-      videoRef.current.pause();
-      setPause(true);
-    }
+    const newTime = progress + value;
+    videoRef.current.pause();
+    setPause(true);
     videoRef.current.currentTime = newTime;
     setProgress(newTime);
   };
 
-  const handleSkipForwardMs = () => {
-    const newTime = progress + 0.1;
+  const handleRewind = (value = SECOND_VALUE) => {
     if (!videoRef.current) return;
-    if (!pause) {
-      videoRef.current.pause();
-      setPause(true);
-    }
-    videoRef.current.currentTime = newTime;
-    setProgress(newTime);
-  };
-
-  const handleRewindSecond = () => {
-    const newTime = progress - 1;
-    if (!videoRef.current) return;
-    if (!pause) {
-      videoRef.current.pause();
-      setPause(true);
-    }
-    videoRef.current.currentTime = newTime;
-    setProgress(newTime);
-  };
-
-  const handleRewindMs = () => {
-    const newTime = progress - 0.1;
-    if (!videoRef.current) return;
-    if (!pause) {
-      videoRef.current.pause();
-      setPause(true);
-    }
+    const newTime = progress - value;
+    videoRef.current.pause();
+    setPause(true);
     videoRef.current.currentTime = newTime;
     setProgress(newTime);
   };
 
   return (
-    <>
-      <button onClick={handleRewindSecond}>{"<<"}</button>
-      <button onClick={handleRewindMs}>{"<"}</button>
-      <button onClick={handlePause}>PLAY</button>
-      <button onClick={handleSkipForwardMs}>{">"}</button>
-      <button onClick={handleSkipForwardSecond}>{">>"}</button>
-    </>
+    <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-3xl">
+      <Button
+        title={"<<"}
+        action={() => {
+          handleRewind(SECOND_VALUE);
+        }}
+      />
+      <Button
+        title={"<"}
+        action={() => {
+          handleRewind(MS_VALUE);
+        }}
+      />
+      <Button title={pause ? "PAUSE" : "PLAY"} action={handlePause} />
+      <Button
+        title={">"}
+        action={() => {
+          handleSkipForward(MS_VALUE);
+        }}
+      />
+      <Button
+        title={">>"}
+        action={() => {
+          handleSkipForward(SECOND_VALUE);
+        }}
+      />
+    </div>
   );
 };
 

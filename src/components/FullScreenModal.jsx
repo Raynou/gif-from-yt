@@ -1,11 +1,7 @@
 const FullScreenModal = () => {
   return (
-    <div className="fullscreen-modal">
-      <div className="modal-backdrop" />
-      <div className="modal-content">
-        <span>Cargando...</span>
-        {/* Puedes meter un spinner aquí */}
-      </div>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="text-white text-xl">Cargando...</div>
     </div>
   );
 };
