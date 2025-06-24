@@ -35,6 +35,29 @@ const GifForm = () => {
       });
   };
 
+  const handlePreview = () => {
+    if (!videoRef.current) return;
+
+    const video = videoRef.current;
+    const startTime = progress;
+    const endTime = startTime + gifDuration;
+
+    video.currentTime = startTime;
+    setPause(false);
+    video.play();
+
+    const stopPlayback = () => {
+      if (video.currentTime >= endTime) {
+        video.pause();
+        video.removeEventListener("timeupdate", stopPlayback);
+        video.currentTime = startTime;
+        setPause(true);
+      }
+    };
+
+    video.addEventListener("timeupdate", stopPlayback);
+  };
+
   const formatTimeAndDuration = () => {
     const minutes = Number.parseInt(progress / 60);
     const seconds = Number.parseInt(progress % 60);
@@ -58,7 +81,7 @@ const GifForm = () => {
           gifDuration={gifDuration}
           setGifDuration={setGifDuration}
         />
-        <Button title={"Preview"} action={() => {}} />
+        <Button title={"Preview"} action={handlePreview} />
         <VideoSlider
           videoDuration={duration}
           videoRef={videoRef}

@@ -23,12 +23,16 @@ const VideoForm = ({
     });
     onSubmitSucess(url);
   };
-
   const inputStyle =
-    variant === "default" ? "w-full p-4 text-xl mb-4" : "mx-1 py-1 w-1/2";
+    variant === "default"
+      ? "w-full p-4 text-xl mb-4"
+      : "flex-[3] py-1 px-2 text-base border text-typo";
   const buttonStyle =
-    variant === "default" ? "w-full py-4 text-xl font-semibold" : "p-1";
-  const divStyle = variant === "default" ? "" : "w-full flex justify-center";
+    variant === "default"
+      ? "w-full py-4 text-xl font-semibold"
+      : "p-1 flex-[1]";
+  const divStyle =
+    variant === "default" ? "" : "w-full flex justify-center gap-1";
 
   return (
     <>
