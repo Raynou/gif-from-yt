@@ -48,7 +48,40 @@ app.post("/gif", (req, res) => {
 });
 
 app.get("/video", (req, res) => {
-    res.sendFile("/server/video/output.mp4", { root: "." });
+    const path = `${VIDEO_FOLDER}/output.mp4`;
+
+    fs.stat(path, (err, stats) => {
+        if (err) {
+            console.error("Error accessing video file", err);
+            return res.sendStatus(404);
+        }
+
+        const range = req.headers.range;
+        if (!range) {
+            // If there's no header range, send the whole video
+            res.writeHead(200, {
+                "Content-Length": stats.size,
+                "Content-Type": "video/mp4",
+            });
+            fs.createReadStream(path).pipe(res);
+            return;
+        }
+
+        const CHUNK_SIZE = 10 ** 6; // 1MB per block
+        const start = Number(range.replace(/\D/g, ""));
+        const end = Math.min(start + CHUNK_SIZE, stats.size - 1);
+
+        const contentLength = end - start + 1;
+        const headers = {
+            "Content-Range": `bytes ${start}-${end}/${stats.size}`,
+            "Accept-Ranges": "bytes",
+            "Content-Length": contentLength,
+            "Content-Type": "video/mp4",
+        };
+
+        res.writeHead(206, headers); // 206 = Partial Content
+        fs.createReadStream(path, { start, end }).pipe(res);
+    });
 });
 
 app.listen(PORT, () => {
