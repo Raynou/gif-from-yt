@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  web-app:
+    build: .
+    container_name: web-app
+    env_file:
+      - .env
+    ports:
+      - "${PORT}:${PORT}"
+    restart: unless-stopped

@@ -1,14 +1,19 @@
 FROM node:24-alpine as node
-FROM mikenye/youtube-dl:2025.04.30
-FROM linuxserver/ffmpeg
+
+RUN apk add --no-cache ffmpeg python3 py3-pip
+
+RUN pip install --no-cache-dir --break-system-packages youtube-dl
 
 WORKDIR /app
 
+COPY package*.json ./
+
 RUN npm install
 
-RUN npm build
+COPY . .
+
+RUN npm run build
 
 EXPOSE 3000
 
 CMD [ "npm", "run", "start" ]
-

@@ -7,15 +7,19 @@
     "dev": "concurrently \"npm run dev:server\"  \"npm run dev:client\"",
     "dev:client": "vite",
     "dev:server": "nodemon run server/index.js",
-    "build": "vite build",
+    "build": "grunt build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node ./dist/index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "ffmpeg": "^0.0.4",
+    "grunt": "^1.6.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-shell": "^4.0.0",
     "morgan": "^1.10.0",
     "nodemon": "^3.1.10",
     "react": "^19.1.0",
