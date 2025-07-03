@@ -13,7 +13,7 @@ const Home = () => {
         onSubmit={() => setIsLoading(true)}
         onSubmitSucess={(url) => {
           const id = url.split("?v=")[1];
-          navigate("/gif?v=" + id);
+          navigate("/youtube?v=" + id);
         }}
       />
     </div>

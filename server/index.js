@@ -11,8 +11,8 @@ const app = express();
 const FILENAME = fileURLToPath(import.meta.url);
 const DIRNAME = dirname(FILENAME);
 const PORT = process.env.PORT;
-const GIF_FOLDER = "./server/gif";
-const VIDEO_FOLDER = "./server/video";
+const GIF_FOLDER = join(DIRNAME, "gif");
+const VIDEO_FOLDER = join(DIRNAME, "video");
 
 if (!fs.existsSync(GIF_FOLDER)) {
   fs.mkdirSync(GIF_FOLDER);
@@ -28,34 +28,35 @@ app.use(express.static(join(DIRNAME, "public")));
 
 app.post("/url", async (req, res) => {
   const url = req.body.url.split("&").shift();
-  const pathToVideo = `${VIDEO_FOLDER}/output.mp4`;
-  if (fs.existsSync(pathToVideo)) {
-    fs.rmSync(pathToVideo);
-  }
+  const videoId = url.split("v=")[1];
+  const fileName = videoId + ".mp4";
+  const pathToVideo = join(VIDEO_FOLDER, fileName);
+
   await youtubeDl(url, {
     output: pathToVideo,
-    /**
-     * Download a video from YT in 480p without audio
-     */
     format: "bv*[height<=480][ext=mp4]",
   });
-  res.sendStatus(200).end();
+
+  res.send(200);
 });
 
 app.post("/gif", (req, res) => {
-  const { init, duration } = req.body;
-  const gifPath = `${GIF_FOLDER}/output.gif`;
-  const videoPath = `${VIDEO_FOLDER}/output.mp4`;
+  const { init, duration, videoId } = req.body;
+  const gifFile = videoId + ".gif";
+  const videoFile = videoId + ".mp4";
+  const gifPath = join(GIF_FOLDER, gifFile);
+  const videoPath = join(VIDEO_FOLDER, videoFile);
   execSync(
     `ffmpeg -y -ss ${init} -t ${duration} -i ${videoPath} -vf "fps=30,scale=520:-1:flags=lanczos" ${gifPath}`
   );
-  res.sendFile("/server/gif/output.gif", { root: "." });
+  res.sendFile(gifPath);
 });
 
 app.get("/video", (req, res) => {
-  const path = `${VIDEO_FOLDER}/output.mp4`;
+  const id = req.query.id;
+  const videoPath = join(VIDEO_FOLDER, id + ".mp4");
 
-  fs.stat(path, (err, stats) => {
+  fs.stat(videoPath, (err, stats) => {
     if (err) {
       console.error("Error accessing video file", err);
       return res.sendStatus(404);
@@ -68,7 +69,7 @@ app.get("/video", (req, res) => {
         "Content-Length": stats.size,
         "Content-Type": "video/mp4",
       });
-      fs.createReadStream(path).pipe(res);
+      fs.createReadStream(videoPath).pipe(res);
       return;
     }
 
@@ -85,7 +86,7 @@ app.get("/video", (req, res) => {
     };
 
     res.writeHead(206, headers); // 206 = Partial Content
-    fs.createReadStream(path, { start, end }).pipe(res);
+    fs.createReadStream(videoPath, { start, end }).pipe(res);
   });
 });
 

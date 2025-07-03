@@ -3,13 +3,24 @@ import GifDurationSlider from "./GifDurationSlider";
 import VideoSlider from "./VideoSlider";
 import VideoPlaybackControls from "./VideoPlaybackControls";
 import Button from "./Button";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 
 const GifForm = () => {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [gifDuration, setGifDuration] = useState(1.0);
   const [pause, setPause] = useState(false);
+  const [params] = useSearchParams();
+  const [videoId, setVideoId] = useState();
   const videoRef = useRef(null);
+
+  useEffect(() => {
+    const id = params.get("v");
+    if (id) {
+      setVideoId(id);
+    }
+  }, [params]);
 
   const handleTimeUpdate = () => setProgress(videoRef.current.currentTime || 0);
 
@@ -22,7 +33,7 @@ const GifForm = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ init, duration }),
+      body: JSON.stringify({ init, duration, videoId }),
     })
       .then((res) => res.blob())
       .then((blob) => {
@@ -96,15 +107,17 @@ const GifForm = () => {
           setPause={setPause}
         />
       </div>
-      <video
-        ref={videoRef}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        className="w-full rounded-lg border border-typo"
-        controls
-        autoPlay
-        src="http://localhost:3000/video"
-      />
+      {videoId && (
+        <video
+          ref={videoRef}
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          className="w-full rounded-lg border border-typo"
+          controls
+          autoPlay
+          src={`http://localhost:3000/video?id=${videoId}`}
+        />
+      )}
 
       <Button
         title={"🎞️ Create GIF"}
