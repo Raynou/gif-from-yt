@@ -2,10 +2,12 @@ import { useState } from "react";
 
 const VideoForm = ({
   onSubmit = () => {},
+  onError = () => {},
   onSubmitSucess = () => {},
   variant = "default",
 }) => {
   const [url, setUrl] = useState("");
+  const [showErrorLabel, setShowErrorLabel] = useState(false);
   const handleInput = (e) => {
     setUrl(e.target.value);
   };
@@ -14,15 +16,21 @@ const VideoForm = ({
     const data = {
       url: url,
     };
-    await fetch("http://localhost:3000/url", {
+    const res = await fetch("http://localhost:3000/url", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
+    if (!res.ok) {
+      setShowErrorLabel(true);
+      onError();
+      return;
+    }
     onSubmitSucess(url);
   };
+
   const inputStyle =
     variant === "default"
       ? "w-full p-4 text-xl mb-4"
@@ -35,7 +43,8 @@ const VideoForm = ({
     variant === "default" ? "" : "w-full flex justify-center gap-1";
 
   return (
-    <>
+    <div className={`flex flex-col ${variant !== "default" ? "w-full" : ""}`}>
+      {showErrorLabel && <p className="text-red-400">Unable to find video</p>}
       <div className={divStyle}>
         <input
           value={url}
@@ -44,13 +53,16 @@ const VideoForm = ({
           className={`bg-secondary border border-typo rounded ${inputStyle}`}
         />
         <button
-          onClick={getVideo}
+          onClick={() => {
+            if (url === "") return;
+            getVideo();
+          }}
           className={`bg-peach hover:contrast-105 hover:cursor-pointer rounded text-typo ${buttonStyle}`}
         >
           Get video
         </button>
       </div>
-    </>
+    </div>
   );
 };
 

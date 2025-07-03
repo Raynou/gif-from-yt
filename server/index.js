@@ -27,17 +27,27 @@ app.use(express.json());
 app.use(express.static(join(DIRNAME, "public")));
 
 app.post("/url", async (req, res) => {
-  const url = req.body.url.split("&").shift();
-  const videoId = url.split("v=")[1];
-  const fileName = videoId + ".mp4";
-  const pathToVideo = join(VIDEO_FOLDER, fileName);
+  try {
+    const YOUTUBE_URL_REGEX =
+      /^https:\/\/(www\.)?youtube\.com\/watch\?v=[\w-]+/;
+    let url = req.body.url;
+    if (typeof url !== "string" || !YOUTUBE_URL_REGEX.test(url)) {
+      return res.status(400).send("Invalid URL");
+    }
+    url = url.split("&").shift();
+    const videoId = url.split("v=")[1];
+    const fileName = videoId + ".mp4";
+    const pathToVideo = join(VIDEO_FOLDER, fileName);
 
-  await youtubeDl(url, {
-    output: pathToVideo,
-    format: "bv*[height<=480][ext=mp4]",
-  });
+    await youtubeDl(url, {
+      output: pathToVideo,
+      format: "bv*[height<=480][ext=mp4]",
+    });
 
-  res.send(200);
+    res.send(200);
+  } catch (e) {
+    return res.status(500).send("Internal server error");
+  }
 });
 
 app.post("/gif", (req, res) => {

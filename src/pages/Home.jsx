@@ -11,6 +11,7 @@ const Home = () => {
       {isLoading && <FullScreenModal />}
       <VideoForm
         onSubmit={() => setIsLoading(true)}
+        onError={() => setIsLoading(false)}
         onSubmitSucess={(url) => {
           const id = url.split("?v=")[1];
           navigate("/youtube?v=" + id);
